@@ -1,3 +1,4 @@
+import ast
 import json
 import os
 import re
@@ -772,6 +773,31 @@ def _json_loose_fix(s: str) -> str:
     return re.sub(r",(\s*[\]}])", r"\1", s)
 
 
+def _try_python_literal_dict(text: str) -> Optional[Dict[str, Any]]:
+    """
+    Fallback for python-like dict/list outputs, e.g. single quotes / True / False.
+    """
+    if not text:
+        return None
+    t = text.strip()
+    start = t.find("{")
+    end = t.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        return None
+    candidate = t[start : end + 1]
+    try:
+        obj = ast.literal_eval(candidate)
+        if isinstance(obj, dict):
+            return obj
+        if isinstance(obj, list):
+            for item in obj:
+                if isinstance(item, dict):
+                    return item
+    except Exception:
+        return None
+    return None
+
+
 def _score_json_richness(obj: Any) -> int:
     """Prefer complete diagnosis objects over {}, wrappers, or tiny fragments."""
     if not isinstance(obj, dict):
@@ -833,7 +859,10 @@ def _json_from_model_text(text: str) -> Optional[Dict[str, Any]]:
             except json.JSONDecodeError:
                 continue
         i = start + 1
-    return best
+    if best is not None:
+        return best
+    # Fallback: tolerate python-like dict/list text
+    return _try_python_literal_dict(t)
 
 
 def _chat_content(data: Dict[str, Any]) -> str:
