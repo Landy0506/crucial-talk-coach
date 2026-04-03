@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>关键对话场景教练</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="brand">关键对话场景教练</div>
+          <div class="sub">问题分析：拆解 CPR、双方路径与情绪成因；沟通建议：仅「下一次沟通」STATE/AMPP 话术</div>
+        </div>
+        <div class="header-actions">
+          <button id="btnLoadDemo" class="btn btn-secondary" type="button">加载示例</button>
+          <button id="btnReset" class="btn btn-ghost" type="button">清空</button>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">场景填写（STAR）</div>
+              <div class="card-hint">1–5 分钟完成，尽量写原话与可验证事实。</div>
+            </div>
+            <div class="pill" id="statusPill">未生成</div>
+          </div>
+
+          <form id="sceneForm" class="form">
+            <div class="row">
+              <label class="field">
+                <div class="label">沟通对象类型（必填）</div>
+                <select id="relationship">
+                  <option value="">请选择</option>
+                  <option value="上级">上级</option>
+                  <option value="同级">同级</option>
+                  <option value="下级">下级</option>
+                  <option value="客户">客户/外部</option>
+                  <option value="家人">家人/亲密关系</option>
+                  <option value="其他">其他</option>
+                </select>
+              </label>
+              <label class="field">
+                <div class="label">对方代称（可选）</div>
+                <input id="counterpart" maxlength="40" placeholder="例如：A / 研发负责人 / 客户项目经理" />
+              </label>
+              <label class="field">
+                <div class="label">沟通渠道（可选）</div>
+                <select id="channel">
+                  <option value="">不确定/混合</option>
+                  <option value="面对面">面对面</option>
+                  <option value="会议">会议</option>
+                  <option value="电话">电话/语音</option>
+                  <option value="IM">IM/聊天</option>
+                  <option value="邮件">邮件</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <div class="label">你想达成的结果（必填）</div>
+              <input id="goal" maxlength="120" placeholder="例如：对齐交付标准与时间点，并确认双方下一步安排" />
+            </label>
+
+            <label class="field">
+              <div class="label">你最担心的风险（必填）</div>
+              <input id="fear" maxlength="120" placeholder="例如：关系变僵/对方防御/项目失控" />
+            </label>
+
+            <div class="star">
+              <div class="star-head">STAR（必填）</div>
+              <label class="field">
+                <div class="label">S · Situation</div>
+                <textarea id="situation" rows="3" maxlength="500"></textarea>
+              </label>
+              <label class="field">
+                <div class="label">T · Task</div>
+                <textarea id="task" rows="2" maxlength="350"></textarea>
+              </label>
+              <label class="field">
+                <div class="label">A · Action（尽量写原话）</div>
+                <textarea id="action" rows="3" maxlength="450"></textarea>
+              </label>
+              <label class="field">
+                <div class="label">R · Result</div>
+                <textarea id="result" rows="2" maxlength="350"></textarea>
+              </label>
+            </div>
+
+            <details class="optional">
+              <summary>可选补充（30–60 秒）</summary>
+              <div class="optional-body">
+                <label class="field">
+                  <div class="label">最近一次你说了什么（原话）</div>
+                  <textarea id="last_dialogue_you" rows="2" maxlength="280"></textarea>
+                </label>
+                <label class="field">
+                  <div class="label">最近一次对方说了什么（原话）</div>
+                  <textarea id="last_dialogue_them" rows="2" maxlength="280"></textarea>
+                </label>
+                <label class="field">
+                  <div class="label">你脑中的故事/解释（可选）</div>
+                  <textarea id="your_story" rows="2" maxlength="220"></textarea>
+                </label>
+                <label class="field">
+                  <div class="label">限制条件（可选）</div>
+                  <input id="constraints" maxlength="160" placeholder="例如：会议只有10分钟/不能公开点名" />
+                </label>
+              </div>
+            </details>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">生成分析与方案</button>
+              <div class="tiny" id="saveHint">自动保存在本机浏览器。</div>
+            </div>
+            <div class="error" id="formError" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <section class="right">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">问题分析</div>
+                <div class="card-hint">CPR / 行为路径 / 共同目标</div>
+              </div>
+              <div class="pill" id="diagPill">未生成</div>
+            </div>
+            <div id="diagBox" class="analysis empty">点击“生成分析与方案”后会先展示这一块。</div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">沟通方式建议</div>
+                <div class="card-hint">STATE / AMPP / 话术</div>
+              </div>
+              <div class="pill" id="planPill">未生成</div>
+            </div>
+            <div id="planBox" class="analysis empty">问题分析出来后，再展示这一块。</div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+

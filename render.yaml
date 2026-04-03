@@ -1,0 +1,10 @@
+# Render Blueprint：https://render.com 连接 Git 仓库后可用此文件一键部署
+# 部署完成后会得到固定地址：https://<你在 Render 里填的服务名>.onrender.com
+
+services:
+  - type: web
+    name: crucial-talk-coach
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
